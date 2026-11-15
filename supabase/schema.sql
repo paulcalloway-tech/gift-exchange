@@ -429,15 +429,15 @@ begin
   me := public._admin();
   select * into g from public.groups where id = me.group_id;
   select count(*) into n from public.members where group_id = me.group_id;
-  if n < 3 then warns := warns || 'You need at least 3 people to draw.'; end if;
+  if n < 3 then warns := array_append(warns, 'You need at least 3 people to draw.'); end if;
   for r in
     select m.display_name, n - 1 - (select count(*) from public.conflicts c
                                     where c.member_a = m.id or c.member_b = m.id) as allowed
       from public.members m where m.group_id = me.group_id
   loop
     if n >= 3 and r.allowed < 2 then
-      warns := warns || format('%s can only be paired with %s %s. Remove a rule.',
-                               r.display_name, r.allowed, case when r.allowed = 1 then 'person' else 'people' end);
+      warns := array_append(warns, format('%s can only be paired with %s %s. Remove a rule.',
+                               r.display_name, r.allowed, case when r.allowed = 1 then 'person' else 'people' end));
     end if;
   end loop;
   return json_build_object(
