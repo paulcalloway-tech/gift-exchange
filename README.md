@@ -42,16 +42,11 @@ The publishable/anon key is meant to be public. The database only allows the app
 3. Go to **Settings** → **Pages**. Under "Build and deployment", choose **Deploy from a branch**, branch **main**, folder **/ (root)**, then **Save**.
 4. After a minute, the page shows your site address, like `https://yourname.github.io/gift-exchange/`.
 
-## 3. Turn on the keep-alive job
+## 3. The keep-alive job
 
-Supabase pauses free projects after 7 days without activity. The included job pings the database every other day until **January 6** and then stops by itself. You can change that date at the top of `keepalive.yml`.
+Supabase pauses free projects after 7 days without activity. The included job pings the database every other day until **January 6** and then stops by itself. You can change that date at the top of `.github/workflows/keepalive.yml`.
 
-1. In your repository, go to **Settings** → **Secrets and variables** → **Actions**.
-2. Under **Secrets**, add:
-   - `SUPABASE_URL`: your Project URL
-   - `SUPABASE_KEY`: the same publishable/anon key
-3. *(Optional)* Under **Variables**, add `SITE_URL` with your site address so the job also checks that the website loads.
-4. Go to the **Actions** tab. If asked, click to enable workflows. Open **Keep gift exchange awake** → **Run workflow** to try it now. A green check means it's working.
+It reads the database address and public key from `config.js`, so there's nothing to set up. To check it, open the **Actions** tab → **Keep gift exchange awake** → **Run workflow**. A green check means the database and the website both answered.
 
 If a check ever fails, GitHub emails you. The usual fix is to open supabase.com and click **Resume project**.
 
