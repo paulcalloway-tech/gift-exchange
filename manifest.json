@@ -1,0 +1,13 @@
+{
+  "name": "Gift Exchange",
+  "short_name": "Gift Exchange",
+  "description": "Draw names, share Amazon wish lists, keep it a surprise.",
+  "display": "standalone",
+  "background_color": "#FBF7F0",
+  "theme_color": "#1F4D3A",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

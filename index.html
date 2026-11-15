@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Gift Exchange">
+<meta name="theme-color" content="#FBF7F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101A15" media="(prefers-color-scheme: dark)">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Gift Exchange</title>
+<style>
+  :root {
+    --bg: #FBF7F0; --card: #FFFFFF; --ink: #1D2A23; --muted: #69756E; --line: #E9E2D5;
+    --green: #1F4D3A; --green-soft: #E4EEE8; --berry: #A8243A; --berry-soft: #F7E3E6;
+    --gold: #B8861F; --gold-soft: #FBF1DA; --btn-ink: #FFFFFF;
+    --shadow: 0 1px 2px rgba(29,42,35,.06), 0 6px 20px rgba(29,42,35,.06);
+    --serif: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101A15; --card: #18251F; --ink: #EEF2EE; --muted: #9DAAA2; --line: #2A3A32;
+      --green: #2F7A5A; --green-soft: #1F3329; --berry: #E26A82; --berry-soft: #3A2228;
+      --gold: #E0B85A; --gold-soft: #33301F; --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.45 var(--sans); }
+  body { min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  main {
+    max-width: 480px; margin: 0 auto;
+    padding: calc(env(safe-area-inset-top) + 20px) 18px calc(env(safe-area-inset-bottom) + 110px);
+  }
+  h1, h2 { font-family: var(--serif); font-weight: 600; letter-spacing: -.01em; margin: 0; }
+  h1 { font-size: 32px; line-height: 1.15; }
+  h2 { font-size: 21px; margin-bottom: 6px; }
+  p { margin: 6px 0; }
+  a { color: var(--green); }
+  .muted { color: var(--muted); font-size: 15px; }
+  .fine { color: var(--muted); font-size: 13px; text-align: center; margin: 18px 8px; }
+  .eyebrow { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin: 0 0 4px; }
+  .meta { color: var(--muted); font-size: 15px; margin-top: 6px; }
+  header.top { margin: 4px 2px 18px; }
+
+  .card { background: var(--card); border-radius: 16px; padding: 18px; margin: 14px 0; box-shadow: var(--shadow); border: 1px solid var(--line); }
+  .hero { text-align: center; padding: 28px 8px 10px; }
+  .hero h1 { margin-top: 12px; font-size: 36px; }
+
+  label.field { display: block; margin: 14px 0 0; font-size: 15px; font-weight: 600; }
+  label.field small { display: block; font-weight: 400; color: var(--muted); margin-top: 1px; }
+  input, select, textarea {
+    display: block; width: 100%; margin-top: 6px; padding: 13px 14px; font: 17px var(--sans); color: var(--ink);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 12px; outline: none; -webkit-appearance: none; appearance: none;
+  }
+  select { background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+           background-position: calc(100% - 20px) 52%, calc(100% - 15px) 52%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 36px; }
+  textarea { resize: vertical; min-height: 120px; line-height: 1.4; }
+  input:focus, select:focus, textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft); }
+  input.pin { letter-spacing: .5em; font-size: 22px; text-align: center; max-width: 170px; }
+
+  .btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 52px; margin-top: 18px;
+    padding: 12px 18px; border: 0; border-radius: 14px; background: var(--green); color: var(--btn-ink);
+    font: 600 17px var(--sans); text-decoration: none; cursor: pointer; transition: transform .1s, opacity .2s;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn:disabled { opacity: .45; }
+  .btn.secondary { background: var(--green-soft); color: var(--green); }
+  @media (prefers-color-scheme: dark) { .btn.secondary { color: #CFE6DA; } }
+  .btn.berry { background: var(--berry); }
+  .linkbtn { background: none; border: 0; padding: 10px 0; color: var(--green); font: 600 16px var(--sans); cursor: pointer; display: block; margin: 8px auto 0; }
+  .linkbtn.danger { color: var(--berry); }
+  details.help { margin-top: 8px; font-size: 14px; color: var(--muted); }
+  details.help summary { color: var(--green); cursor: pointer; font-weight: 600; list-style: none; }
+  details.help summary::-webkit-details-marker { display: none; }
+  details.help ol { padding-left: 20px; margin: 6px 0; }
+
+  .wish { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .wish-title { font: 600 19px var(--serif); margin: 0; }
+  .or { display: flex; align-items: center; gap: 10px; margin: 16px 0 0; color: var(--muted); font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .wish-box { text-align: left; margin-top: 18px; background: var(--bg); border-radius: 14px; padding: 14px 16px; }
+  ul.wishlist { margin: 6px 0 0; padding-left: 20px; }
+  ul.wishlist li { margin: 6px 0; overflow-wrap: anywhere; }
+  .banner { background: var(--gold-soft); border-radius: 14px; padding: 12px 14px; font-size: 15px; margin: 12px 0; }
+  .banner strong { display: block; }
+
+  /* Reveal card */
+  .flip { display: grid; perspective: 1200px; margin: 14px 0; }
+  .flip > * { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform .7s cubic-bezier(.2,.8,.2,1); }
+  .flip-back { transform: rotateY(180deg); }
+  .flip.flipped .flip-front { transform: rotateY(-180deg); }
+  .flip.flipped .flip-back { transform: rotateY(0); }
+  .flip-front {
+    min-height: 260px; border: 0; border-radius: 20px; padding: 28px 22px; cursor: pointer; color: #FFF8EC;
+    background: radial-gradient(120% 90% at 20% 0%, #2E6B52 0%, #1F4D3A 55%, #163828 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; font-family: var(--sans);
+    box-shadow: 0 10px 30px rgba(31,77,58,.28);
+  }
+  .flip-front .big { font: 600 24px/1.25 var(--serif); max-width: 260px; }
+  .flip-front .small { font-size: 14px; opacity: .75; }
+  .flip-back .card { margin: 0; }
+  .person { text-align: center; padding: 24px 20px 20px; }
+  .person-name { font-size: 40px; line-height: 1.1; margin: 4px 0 4px; }
+  .person.done { border-color: var(--gold); }
+  .note { background: var(--bg); border-radius: 12px; padding: 12px; color: var(--muted); font-size: 15px; margin-top: 16px; }
+
+  .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); cursor: pointer; }
+  .switch-row small { display: block; color: var(--muted); font-size: 14px; }
+  .switch-row input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .switch { flex: none; width: 52px; height: 32px; border-radius: 99px; background: var(--line); position: relative; transition: background .2s; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
+  .switch-row input:checked + .switch { background: var(--gold); }
+  .switch-row input:checked + .switch::after { transform: translateX(20px); }
+  .switch-row input:focus-visible + .switch { box-shadow: 0 0 0 3px var(--green-soft); }
+
+  .progress { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; margin-top: 10px; }
+  .progress > div { height: 100%; background: var(--gold); border-radius: 99px; transition: width .6s; }
+  .stat { display: flex; justify-content: space-between; align-items: baseline; }
+  .stat strong { font-family: var(--serif); font-size: 22px; }
+
+  ul.people { list-style: none; padding: 0; margin: 10px 0 0; }
+  ul.people li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 0; border-top: 1px solid var(--line); }
+  ul.people li:first-child { border-top: 0; }
+  .avatar { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 15px; color: var(--green); background: var(--green-soft); }
+  .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .who > div { min-width: 0; }
+  .who strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tag { font-size: 12px; color: var(--muted); font-weight: 600; }
+  .badges { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 3px; }
+  .badge { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+  .badge.yes { background: var(--green-soft); color: var(--green); border-color: transparent; }
+  @media (prefers-color-scheme: dark) { .badge.yes { color: #9FD6BB; } }
+  .badge.warn { background: var(--berry-soft); color: var(--berry); border-color: transparent; }
+  .mini { font: 600 14px var(--sans); color: var(--green); background: var(--green-soft); border: 0; border-radius: 99px; padding: 7px 12px; cursor: pointer; }
+  details.menu { position: relative; flex: none; }
+  details.menu summary { list-style: none; cursor: pointer; padding: 6px 10px; color: var(--muted); font-weight: 700; letter-spacing: .1em; border-radius: 10px; }
+  details.menu summary::-webkit-details-marker { display: none; }
+  details.menu[open] summary { background: var(--bg); }
+  details.menu .menu-body { position: absolute; right: 0; top: 38px; z-index: 5; background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,.16); min-width: 170px; overflow: hidden; }
+  details.menu .menu-body button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 13px 16px; font: 16px var(--sans); color: var(--ink); cursor: pointer; }
+  details.menu .menu-body button + button { border-top: 1px solid var(--line); }
+  details.menu .menu-body .danger { color: var(--berry); }
+
+  .pair-form { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: end; }
+  .pair-form .amp { padding-bottom: 14px; color: var(--muted); font-family: var(--serif); font-size: 20px; }
+  ul.pairs { list-style: none; padding: 0; margin: 12px 0 0; }
+  ul.pairs li { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border-radius: 12px; padding: 10px 8px 10px 14px; margin-top: 8px; }
+  ul.pairs .x { border: 0; background: none; color: var(--muted); font-size: 18px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
+  ul.warnings { margin: 10px 0 0; padding: 0; list-style: none; }
+  ul.warnings li { background: var(--berry-soft); color: var(--berry); border-radius: 12px; padding: 10px 12px; font-size: 15px; margin-top: 8px; }
+  .linkbox { margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: var(--bg); border: 1px dashed var(--line); font: 14px ui-monospace, Menlo, monospace; word-break: break-all; color: var(--muted); }
+  .status-pill { display: inline-block; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--gold-soft); color: var(--gold); margin-left: 6px; vertical-align: middle; font-family: var(--sans); }
+
+  nav#tabs {
+    position: fixed; left: 0; right: 0; bottom: 0; display: none; justify-content: center; gap: 6px;
+    padding: 8px 12px calc(env(safe-area-inset-bottom) + 8px);
+    background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--line);
+  }
+  nav#tabs.show { display: flex; }
+  nav#tabs button { flex: 1; max-width: 200px; border: 0; background: none; padding: 8px; border-radius: 12px; font: 600 15px var(--sans); color: var(--muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  nav#tabs button.on { color: var(--green); background: var(--green-soft); }
+  @media (prefers-color-scheme: dark) { nav#tabs button.on { color: #CFE6DA; } }
+
+  #toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom) + 86px); transform: translate(-50%, 20px); opacity: 0;
+    background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: 14px; font-size: 15px; max-width: calc(100% - 36px);
+    transition: opacity .25s, transform .25s; pointer-events: none; z-index: 20; text-align: center; }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+  #toast.bad { background: var(--berry); color: #fff; }
+
+  /* Photos and avatars */
+  img.avatar { object-fit: cover; padding: 0; }
+  .avatar.lg { width: 84px; height: 84px; font-size: 30px; margin: 4px auto 6px; }
+  .avatar.md { width: 64px; height: 64px; font-size: 22px; }
+  .photo-row { display: flex; align-items: center; gap: 14px; margin-top: 14px; }
+  .photo-row .mini { display: inline-flex; align-items: center; position: relative; overflow: hidden; }
+  .photo-row input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .name-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: var(--gold-soft); color: var(--gold); }
+  .ship { white-space: pre-line; }
+
+  /* Anonymous questions */
+  .qa { text-align: left; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .qa h3, .card h3 { font: 600 17px var(--sans); margin: 0 0 4px; }
+  .q { background: var(--bg); border-radius: 12px; padding: 10px 12px; margin-top: 8px; font-size: 15px; }
+  .q .a { margin-top: 6px; color: var(--green); font-weight: 600; }
+  .q .a.wait { color: var(--muted); font-weight: 400; font-style: italic; }
+  .q form { margin-top: 8px; display: flex; gap: 8px; }
+  .q form input { margin: 0; }
+  .q form button { flex: none; margin: 0; width: auto; min-height: 0; padding: 0 16px; }
+  .inline-form { display: flex; gap: 8px; margin-top: 10px; }
+  .inline-form input { margin: 0; }
+  .inline-form .btn { margin: 0; width: auto; min-height: 50px; padding: 0 18px; flex: none; }
+
+  /* The gift chain */
+  .chain-card { border-color: var(--gold); }
+  ul.chain { list-style: none; margin: 12px 0 0; padding: 0; }
+  ul.chain li { display: grid; grid-template-columns: 1fr 28px 1fr; align-items: center; gap: 6px; padding: 7px 0; border-top: 1px solid var(--line); }
+  ul.chain li:first-child { border-top: 0; }
+  ul.chain .who { gap: 8px; }
+  ul.chain .avatar { width: 32px; height: 32px; font-size: 13px; }
+  ul.chain .arrow { color: var(--gold); font-weight: 700; text-align: center; }
+  .banner .x { float: right; background: none; border: 0; font-size: 18px; color: inherit; cursor: pointer; margin: -4px -6px 0 8px; }
+
+  /* Wide screens: iPhone Duo unfolded, tablets, landscape — two columns */
+  .cols { display: block; }
+  @media (min-width: 700px) {
+    main { max-width: 920px; padding-left: 28px; padding-right: 28px; }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 22px; align-items: start; }
+    .hero, .narrow { max-width: 520px; margin-left: auto; margin-right: auto; }
+    #toast { bottom: calc(env(safe-area-inset-bottom) + 96px); }
+  }
+  /* Short screens: iPhone Duo folded (wide but short), phones in landscape */
+  @media (max-height: 640px) {
+    main { padding-top: calc(env(safe-area-inset-top) + 12px); }
+    .hero { padding-top: 10px; }
+    .flip-front { min-height: 200px; padding: 20px; }
+    h1 { font-size: 28px; }
+    .person-name { font-size: 34px; }
+  }
+  /* Older Android browsers (e.g. older Samsung Internet) without color-mix */
+  @supports not (background: color-mix(in srgb, red 50%, blue)) {
+    nav#tabs { background: var(--bg); }
+  }
+
+  .loading { display: grid; place-items: center; min-height: 60vh; color: var(--muted); }
+  .spinner { width: 28px; height: 28px; border: 3px solid var(--line); border-top-color: var(--green); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .confetti { position: fixed; top: -12px; width: 9px; height: 14px; border-radius: 2px; z-index: 30; pointer-events: none; animation: fall 2.4s cubic-bezier(.25,.6,.4,1) forwards; }
+  @keyframes fall { to { transform: translate(var(--dx), 105vh) rotate(var(--rot)); opacity: .9; } }
+  @media (prefers-reduced-motion: reduce) { .flip > * { transition: none; } .confetti { display: none; } }
+</style>
+</head>
+<body>
+<main id="app"><div class="loading"><div class="spinner"></div></div></main>
+<nav id="tabs" aria-label="Sections"></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script type="module">
+// ---------------------------------------------------------------------------
+//  Gift Exchange — one-page app. Talks only to the database functions in
+//  supabase/schema.sql. Sign-in is invisible (an anonymous Supabase session
+//  per phone) plus a name and 4-digit PIN to get back in on another device.
+// ---------------------------------------------------------------------------
+const CFG = window.GIFT_CONFIG || {};
+const $app = document.getElementById('app');
+const $tabs = document.getElementById('tabs');
+const S = { state: null, preview: null, admin: null, reveal: null, view: null, tab: 'home' };
+let sb = null;
+
+// ---------- helpers ----------
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const initials = n => esc(String(n || '?').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase());
+const avatar = (name, photo, cls = '') => (photo && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(photo))
+  ? `<img class="avatar ${cls}" src="${esc(photo)}" alt="">`
+  : `<span class="avatar ${cls}">${initials(name)}</span>`;
+function composeName(first, last) {
+  first = String(first || '').trim().replace(/\s+/g, ' ');
+  last = String(last || '').trim();
+  return last ? `${first} ${last[0].toUpperCase()}.` : first;
+}
+// Crop to a square and shrink to a small JPEG (about 10 KB) before saving.
+async function shrinkPhoto(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error("That photo couldn't be opened. Try a different one."));
+      i.src = url;
+    });
+    const s = Math.min(img.naturalWidth, img.naturalHeight), size = 192;
+    const cv = document.createElement('canvas'); cv.width = cv.height = size;
+    cv.getContext('2d').drawImage(img, (img.naturalWidth - s) / 2, (img.naturalHeight - s) / 2, s, s, 0, 0, size, size);
+    let q = 0.82, out = cv.toDataURL('image/jpeg', q);
+    while (out.length > 55000 && q > 0.4) { q -= 0.1; out = cv.toDataURL('image/jpeg', q); }
+    return out;
+  } finally { URL.revokeObjectURL(url); }
+}
+const shortDate = iso => iso ? new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : '';
+function fmtDate(d) {
+  if (!d) return '';
+  const [y, m, dd] = d.split('-').map(Number);
+  return new Date(y, m - 1, dd).toLocaleDateString(undefined, { weekday: 'short', month: 'long', day: 'numeric' });
+}
+function metaLine(g) {
+  const bits = [];
+  if (g.exchange_date) bits.push(fmtDate(g.exchange_date));
+  if (g.budget) bits.push(`${esc(g.budget)} budget`);
+  return bits.join(' · ');
+}
+function store(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} }
+function load(k) { try { return localStorage.getItem(k) || ''; } catch { return ''; } }
+function codeFromText(t) {
+  t = String(t || '').trim();
+  const m = t.match(/[?&]g=([A-Za-z0-9]+)/);
+  return (m ? m[1] : t.replace(/[^A-Za-z0-9]/g, '')).toUpperCase();
+}
+function getCode() {
+  const c = new URLSearchParams(location.search).get('g');
+  if (c) { store('giftCode', codeFromText(c)); return codeFromText(c); }
+  return load('giftCode').toUpperCase();
+}
+function setCodeInUrl(code) {
+  const u = new URL(location.href);
+  if (code) u.searchParams.set('g', code); else u.searchParams.delete('g');
+  history.replaceState(null, '', u);
+  store('giftCode', code || null);
+}
+function inviteLink(code) { const u = new URL(location.href); u.search = `?g=${code}`; u.hash = ''; return u.toString(); }
+
+let toastTimer;
+function toast(msg, bad = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show' + (bad ? ' bad' : '');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.className = ''), 3400);
+}
+function niceError(e) {
+  let m = (e && e.message) || String(e);
+  if (/Failed to fetch|NetworkError|Load failed/i.test(m)) m = "Can't reach the server. Check your connection and try again.";
+  return m;
+}
+async function busy(btn, fn) {
+  const label = btn && btn.innerHTML;
+  if (btn) { btn.disabled = true; btn.textContent = 'One moment…'; }
+  try { await fn(); }
+  catch (e) { toast(niceError(e), true); }
+  finally { if (btn && btn.isConnected) { btn.disabled = false; btn.innerHTML = label; } }
+}
+
+async function api(fn, args = {}) {
+  if (window.GIFT_MOCK) return window.GIFT_MOCK(fn, args);
+  const { data, error } = await sb.rpc(fn, args);
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+const giftSvg = (size = 64, ink = 'currentColor') => `
+<svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+  <rect x="9" y="26" width="46" height="30" rx="5" fill="${ink}" opacity=".16"/>
+  <rect x="6" y="18" width="52" height="12" rx="4" fill="${ink}" opacity=".28"/>
+  <rect x="28" y="18" width="8" height="38" fill="${ink}" opacity=".85"/>
+  <path d="M32 18c-4-9-15-11-15-4 0 4 7 4 15 4Zm0 0c4-9 15-11 15-4 0 4-7 4-15 4Z" stroke="${ink}" stroke-width="3" stroke-linejoin="round" opacity=".85"/>
+</svg>`;
+
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const colors = ['#A8243A', '#C99A2E', '#2E6B52', '#F3D27A', '#E26A82'];
+  for (let i = 0; i < 70; i++) {
+    const d = document.createElement('div');
+    d.className = 'confetti';
+    d.style.left = Math.random() * 100 + 'vw';
+    d.style.background = colors[i % colors.length];
+    d.style.animationDelay = Math.random() * 0.35 + 's';
+    d.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+    d.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 3200);
+  }
+}
+
+// ---------- shared form bits ----------
+const amazonHelp = `
+<details class="help"><summary>How do I get my Amazon list link?</summary>
+  <ol>
+    <li>Open the Amazon app and go to <strong>Lists</strong>.</li>
+    <li>Pick your list (or make one) and make sure it's set to <strong>Shared</strong> or <strong>Public</strong>.</li>
+    <li>Tap <strong>Share</strong> → <strong>Copy link</strong>, then paste it here.</li>
+  </ol>
+  You can skip this and add it later.
+</details>`;
+const wishFields = (amazon = '', list = '') => `
+<div class="wish">
+  <p class="wish-title">Your wish list</p>
+  <p class="muted" style="margin:2px 0 0">Link an Amazon list, write a simple list, or both. You can add it later.</p>
+  <label class="field">Amazon wish list link
+    <input name="amazon" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false"
+           placeholder="https://www.amazon.com/hz/wishlist/…" value="${esc(amazon)}">
+  </label>${amazonHelp}
+  <div class="or"><span>and / or</span></div>
+  <label class="field">Write a simple list <small>One idea per line. Sizes, colors and favorite stores help.</small>
+    <textarea name="wishlist" rows="5" maxlength="2000" autocapitalize="sentences"
+      placeholder="Cozy socks, size L&#10;Dark roast coffee beans&#10;Anything from Barnes &amp; Noble">${esc(list)}</textarea>
+  </label>
+</div>`;
+// Shows a written list; lines that are web links become tappable.
+function listHtml(text) {
+  const items = String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
+  return `<ul class="wishlist">${items.map(s => /^https?:\/\/\S+$/i.test(s)
+    ? `<li><a href="${esc(s)}" target="_blank" rel="noopener noreferrer">${esc(s.replace(/^https?:\/\/(www\.)?/i, '').slice(0, 48))}${s.length > 56 ? '…' : ''} ↗</a></li>`
+    : `<li>${esc(s)}</li>`).join('')}</ul>`;
+}
+const nameFields = () => `
+<div class="name-row">
+  <label class="field">First name<input name="first" required maxlength="30" autocomplete="given-name" autocapitalize="words"></label>
+  <label class="field">Last name<input name="last" maxlength="30" autocomplete="family-name" autocapitalize="words"></label>
+</div>
+<p class="muted" style="font-size:13px;margin-top:6px">Only your last initial is shown, like “Paul C.”</p>`;
+const photoPicker = (name, photo, pending = false) => `
+<div class="photo-row">
+  <span data-photo-preview>${avatar(name || '?', photo, 'md')}</span>
+  <div>
+    <label class="mini">${photo ? 'Change photo' : 'Add a photo'}
+      <input type="file" accept="image/*" data-act="${pending ? 'photo-pending' : 'photo'}"></label>
+    ${photo && !pending ? `<button type="button" class="linkbtn" style="margin:4px 0 0;padding:4px 0" data-act="photo-remove">Remove</button>` : ''}
+    <p class="muted" style="font-size:13px;margin:4px 0 0">Optional. Otherwise your initials show.</p>
+  </div>
+</div>`;
+const pinField = (label = 'Pick a 4-digit PIN', hint = "You'll use it to get back in on another phone") => `
+<label class="field">${label} <small>${hint}</small>
+  <input class="pin" name="pin" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" required placeholder="····">
+</label>`;
+
+// ---------- views ----------
+function viewSetup() {
+  return `<section class="hero">${giftSvg(72, 'var(--green)')}<h1>Almost there</h1>
+  <p class="muted">Add your Supabase URL and key to <strong>config.js</strong>, then reload. The README walks through it.</p></section>`;
+}
+
+function viewLanding(msg) {
+  return `
+  <section class="hero">${giftSvg(76, 'var(--green)')}
+    <h1>Gift Exchange</h1>
+    <p class="muted">Draw names, share wish lists, keep it a surprise.</p>
+  </section>
+  ${msg ? `<div class="banner"><strong>${esc(msg)}</strong></div>` : ''}
+  <div class="card">
+    <h2>Joining a group?</h2>
+    <p class="muted">Open the invite link the organizer texted you, or paste it here.</p>
+    <form data-form="code">
+      <label class="field">Invite link or code
+        <input name="code" autocapitalize="characters" autocomplete="off" autocorrect="off" placeholder="Paste link or code" required>
+      </label>
+      <button class="btn">Continue</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Organizing?</h2>
+    <p class="muted">Set up a new exchange in about a minute.</p>
+    <button class="btn secondary" data-act="go-create">Start a new exchange</button>
+  </div>`;
+}
+
+function viewCreate() {
+  return `
+  <header class="top"><p class="eyebrow">New exchange</p><h1>Set it up</h1></header>
+  <form data-form="create" class="card">
+    <label class="field">Exchange name<input name="gname" required maxlength="80" placeholder="Family Christmas 2026"></label>
+    <label class="field">Exchange date <small>When gifts get opened</small><input name="date" type="date"></label>
+    <label class="field">Spending limit <small>Shown to everyone</small><input name="budget" maxlength="40" placeholder="$50"></label>
+    <label class="field">Join by <small>Optional. Shown on the invite so people don't drift</small><input name="joinby" type="date"></label>
+    ${nameFields()}
+    ${pinField()}
+    ${wishFields()}
+    <button class="btn">Create exchange</button>
+  </form>
+  <button class="linkbtn" data-act="go-landing">Back</button>`;
+}
+
+function viewJoin(p) {
+  const n = p.members.length;
+  return `
+  <header class="top"><p class="eyebrow">You're invited</p><h1>${esc(p.name)}</h1>
+    <p class="meta">${metaLine(p)}${metaLine(p) ? ' · ' : ''}${n} ${n === 1 ? 'person' : 'people'} in so far</p>
+    ${p.join_by ? `<p class="meta"><span class="pill">Please join by ${fmtDate(p.join_by)}</span></p>` : ''}</header>
+  <form data-form="join" class="card">
+    ${nameFields()}
+    ${photoPicker('', S.pendingPhoto || '', true)}
+    ${pinField()}
+    ${wishFields()}
+    <button class="btn">Join the exchange</button>
+  </form>
+  <button class="linkbtn" data-act="go-reclaim">I already joined</button>
+  <p class="fine">Opening this from your Home Screen for the first time? Tap “I already joined.”</p>`;
+}
+
+function viewReclaim(p) {
+  return `
+  <header class="top"><p class="eyebrow">${esc(p.name)}</p><h1>Welcome back</h1></header>
+  <form data-form="reclaim" class="card">
+    <label class="field">Who are you?
+      <select name="member" required>
+        <option value="">Choose your name</option>
+        ${p.members.map(m => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('')}
+      </select></label>
+    ${pinField('Your PIN', 'The 4 digits you picked when you joined')}
+    <button class="btn">Sign in</button>
+  </form>
+  <button class="linkbtn" data-act="go-join">I haven't joined yet</button>
+  <p class="fine">Forgot your PIN? The organizer can reset it.</p>`;
+}
+
+function revealedCard(r, purchased, myQs = []) {
+  return `
+  <div class="card person ${purchased ? 'done' : ''}">
+    <p class="eyebrow">You're buying for</p>
+    ${r.photo ? avatar(r.name, r.photo, 'lg') : ''}
+    <h2 class="person-name">${esc(r.name)}</h2>
+    ${r.list_updated_at ? `<span class="pill">List updated ${shortDate(r.list_updated_at)}</span>` : ''}
+    ${r.amazon_url
+      ? `<a class="btn" href="${esc(r.amazon_url)}" target="_blank" rel="noopener noreferrer">Open ${esc(r.name)}'s Amazon list ↗</a>` : ''}
+    ${r.wish_list
+      ? `<div class="wish-box"><p class="eyebrow">${r.amazon_url ? 'Also on their list' : 'Their wish list'}</p>${listHtml(r.wish_list)}</div>` : ''}
+    ${!r.amazon_url && !r.wish_list
+      ? `<p class="note">${esc(r.name)} hasn't added a wish list yet. Check back soon, or ask them a question below.</p>` : ''}
+    ${r.ship_to ? `<div class="wish-box"><p class="eyebrow">Ship to</p><div class="ship">${esc(r.ship_to)}</div></div>` : ''}
+    <div class="qa">
+      <h3>Ask ${esc(r.name)} a question</h3>
+      <p class="muted" style="margin:0">They'll never see who asked.</p>
+      ${myQs.map(q => `<div class="q">${esc(q.question)}
+        <div class="a ${q.answer ? '' : 'wait'}">${q.answer ? esc(q.answer) : 'No answer yet'}</div></div>`).join('')}
+      <form data-form="ask" class="inline-form">
+        <input name="q" maxlength="300" required autocomplete="off" placeholder="What size? Favorite color?">
+        <button class="btn secondary">Ask</button>
+      </form>
+    </div>
+    <label class="switch-row">
+      <span><strong>I've bought their gift</strong><small>${purchased ? 'Done! Nice work.' : 'Flip this once it’s ordered'}</small></span>
+      <input type="checkbox" data-act="purchased" ${purchased ? 'checked' : ''}><span class="switch" aria-hidden="true"></span>
+    </label>
+  </div>`;
+}
+
+function questionsCard(qs) {
+  if (!qs || !qs.length) return '';
+  const open = qs.filter(q => !q.answer).length;
+  return `
+  <div class="card">
+    <div class="stat"><h2>Your Santa asked</h2>${open ? `<span class="pill">${open} new</span>` : ''}</div>
+    <p class="muted" style="margin:0">Answer here. Your Santa stays a secret.</p>
+    ${qs.map(q => `<div class="q"><strong>${esc(q.question)}</strong>
+      ${q.answer ? `<div class="a">${esc(q.answer)}</div>`
+        : `<form data-form="answer" data-id="${esc(q.id)}"><input name="a" maxlength="500" required autocomplete="off" placeholder="Your answer"><button class="btn">Send</button></form>`}
+    </div>`).join('')}
+  </div>`;
+}
+
+function chainCard(chain) {
+  if (!chain || !chain.length) return '';
+  return `
+  <div class="card chain-card">
+    <h2>The gift chain</h2>
+    <p class="muted" style="margin:0">Who had whom, all the way around.</p>
+    <ul class="chain">${chain.map((c, i) => {
+      const nx = chain[(i + 1) % chain.length];
+      return `<li><div class="who">${avatar(c.name, c.photo)}<strong>${esc(c.name)}</strong></div>
+        <span class="arrow">→</span><div class="who">${avatar(nx.name, nx.photo)}<strong>${esc(nx.name)}</strong></div></li>`;
+    }).join('')}</ul>
+  </div>`;
+}
+
+function membersCard(st) {
+  const ms = st.members;
+  const withList = ms.filter(m => m.has_list).length;
+  return `
+  <div class="card">
+    <div class="stat"><h2>Who's in</h2><span class="muted">${withList} of ${ms.length} have a list</span></div>
+    <ul class="people">${ms.map(m => `
+      <li><div class="who">${avatar(m.name, m.photo)}
+        <div><strong>${esc(m.name)}</strong>${m.is_admin ? '<span class="tag">Organizer</span>' : ''}</div></div>
+        <span class="badge ${m.has_list ? 'yes' : ''}">${m.has_list ? 'List ✓' : 'No list yet'}</span></li>`).join('')}
+    </ul>
+  </div>`;
+}
+
+function viewHome(st) {
+  const g = st.group, me = st.member, p = st.progress;
+  const hasList = !!(me.amazon_url || me.wish_list);
+  const pinNotice = me.pin_reset_at && load('pinNoticeSeen') !== me.pin_reset_at;
+  let main;
+  if (st.in_draw) {
+    main = S.reveal
+      ? revealedCard(S.reveal, st.purchased, st.my_questions)
+      : `<div class="flip" id="flip">
+           <button class="flip-front" data-act="reveal">${giftSvg(84, '#FFF8EC')}
+             <span class="big">Tap to see who you're buying for</span>
+             <span class="small">Only you can see this</span></button>
+           <div class="flip-back"></div>
+         </div>`;
+    const pct = p.total ? Math.round((p.purchased / p.total) * 100) : 0;
+    main += `
+    <div class="card">
+      <div class="stat"><span class="muted">Gifts bought so far</span><strong>${p.purchased} of ${p.total}</strong></div>
+      <div class="progress"><div style="width:${pct}%"></div></div>
+    </div>`;
+  } else if (g.status === 'drawn') {
+    main = `<div class="card"><h2>Hang tight</h2><p class="muted">Names were drawn before you joined. The organizer will add you, and your person will show up here.</p></div>`;
+  } else {
+    main = `<div class="card" style="text-align:center">${giftSvg(56, 'var(--green)')}
+      <h2>You're in!</h2><p class="muted">Names get drawn ${g.join_by ? `after ${fmtDate(g.join_by)}` : 'once everyone has joined'}. Come back then to see who you're buying for.</p></div>`;
+  }
+  return `
+  <header class="top"><p class="eyebrow">Hi, ${esc(me.name)}</p><h1>${esc(g.name)}</h1>
+    ${metaLine(g) ? `<p class="meta">${metaLine(g)}</p>` : ''}</header>
+  ${pinNotice ? `<div class="banner"><button class="x" data-act="dismiss-pin" data-at="${esc(me.pin_reset_at)}" aria-label="Dismiss">✕</button>
+      <strong>Your PIN was reset by the organizer on ${shortDate(me.pin_reset_at)}</strong>If you didn't ask for that, let them know.</div>` : ''}
+  ${!hasList ? `<div class="banner"><strong>Add your wish list</strong>Link an Amazon list or jot down a few ideas, so whoever draws you knows what to get.</div>` : ''}
+  ${chainCard(st.chain)}
+  <div class="cols"><div class="col">
+  ${main}
+  ${questionsCard(st.questions_for_me)}
+  </div><div class="col">
+  ${membersCard(st)}
+  <details class="card help" style="font-size:inherit;color:inherit" ${!hasList ? 'open' : ''}>
+    <summary style="font-size:17px">Your profile and wish list</summary>
+    ${photoPicker(me.name, me.photo)}
+    <form data-form="me">
+      <label class="field">Name as shown<input name="name" required maxlength="40" value="${esc(me.name)}"></label>
+      ${wishFields(me.amazon_url || '', me.wish_list || '')}
+      <label class="field">Mailing address <small>Only if your gift needs to be mailed. Only your Santa sees it.</small>
+        <textarea name="ship" rows="3" maxlength="300" style="min-height:90px" autocomplete="street-address">${esc(me.ship_to || '')}</textarea></label>
+      <button class="btn secondary">Save</button>
+    </form>
+    ${me.pin_reset_at ? `<p class="muted" style="font-size:13px;margin-top:12px">Your PIN was last reset by the organizer on ${shortDate(me.pin_reset_at)}.</p>` : ''}
+  </details>
+  </div></div>
+  <p class="fine">${/Android/i.test(navigator.userAgent)
+    ? 'Tip: in Chrome, tap ⋮ → “Add to Home screen” to keep this handy.'
+    : 'Tip: in Safari, tap Share → “Add to Home Screen” to keep this handy.'}</p>`;
+}
+
+function reminderText(ov, st) {
+  const d = ov.details, ms = ov.members, drawn = ov.status === 'drawn';
+  const lines = [`Gift exchange reminder: ${d.name}`];
+  const noList = ms.filter(m => !m.has_list).map(m => m.name);
+  if (!drawn) {
+    lines.push(d.join_by ? `If you haven't joined yet, please join by ${fmtDate(d.join_by)}.` : `If you haven't joined yet, please do!`);
+    if (noList.length) lines.push(`Still need a wish list: ${noList.join(', ')}`);
+  } else {
+    const notLooked = ms.filter(m => m.in_draw && !m.viewed).map(m => m.name);
+    const inDraw = ms.filter(m => m.in_draw).length, bought = ms.filter(m => m.purchased).length;
+    if (notLooked.length) lines.push(`Names are drawn! Still need to check who they got: ${notLooked.join(', ')}`);
+    if (noList.length) lines.push(`Still need a wish list: ${noList.join(', ')}`);
+    lines.push(`Gifts bought so far: ${bought} of ${inDraw}.${bought < inDraw ? " If you haven't ordered yet, now's a good time!" : ' Everyone is done!'}`);
+  }
+  const meta = [d.exchange_date && `Exchange: ${fmtDate(d.exchange_date)}`, d.budget && `Budget: ${d.budget}`].filter(Boolean).join(' · ');
+  if (meta) lines.push(meta);
+  lines.push(inviteLink(st.group.invite_code));
+  return lines.join('\n');
+}
+
+function viewAdmin(ov, st) {
+  const g = st.group, d = ov.details, ms = ov.members, drawn = ov.status === 'drawn';
+  const link = inviteLink(g.invite_code);
+  const seen = ms.filter(m => m.viewed).length, bought = ms.filter(m => m.purchased).length;
+  const opts = ms.map(m => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('');
+  const waiting = ms.filter(m => drawn && !m.in_draw);
+  return `
+  <header class="top"><p class="eyebrow">Organizer</p><h1>${esc(g.name)}${drawn ? '<span class="status-pill">Drawn</span>' : ''}</h1></header>
+
+  <div class="cols"><div class="col">
+  <div class="card">
+    <h2>Invite people</h2>
+    <p class="muted">Text this link to everyone in the exchange.</p>
+    <div class="linkbox">${esc(link)}</div>
+    <button class="btn" data-act="share">Share invite link</button>
+  </div>
+
+  <div class="card">
+    <h2>Send a reminder</h2>
+    <p class="muted">A ready-to-send group text. It never says who hasn't bought, only how many.</p>
+    <div class="linkbox" style="white-space:pre-line;font-family:var(--sans);font-size:14px;word-break:normal;overflow-wrap:anywhere">${esc(reminderText(ov, st))}</div>
+    <button class="btn secondary" data-act="reminder">Share reminder</button>
+  </div>
+
+  <div class="card">
+    <div class="stat"><h2>People</h2><span class="muted">${ms.length} joined${drawn ? ` · ${seen} looked · ${bought} bought` : ''}</span></div>
+    <ul class="people">${ms.map(m => `
+      <li>
+        <div class="who">${avatar(m.name, m.photo)}
+          <div><strong>${esc(m.name)}</strong>
+            <div class="badges">
+              <span class="badge ${m.has_list ? 'yes' : ''}">${m.has_list ? 'List ✓' : 'No list'}</span>
+              ${drawn && m.in_draw ? `<span class="badge ${m.viewed ? 'yes' : ''}">${m.viewed ? 'Looked ✓' : 'Not looked'}</span>
+                                      <span class="badge ${m.purchased ? 'yes' : ''}">${m.purchased ? 'Bought ✓' : 'Not bought'}</span>` : ''}
+              ${m.locked ? '<span class="badge warn">PIN locked</span>' : ''}
+            </div></div></div>
+        ${drawn && !m.in_draw ? `<button class="mini" data-act="add-to-draw" data-id="${esc(m.id)}">Add to draw</button>` : ''}
+        <details class="menu"><summary aria-label="Options for ${esc(m.name)}">···</summary>
+          <div class="menu-body">
+            <button data-act="reset-pin" data-id="${esc(m.id)}" data-name="${esc(m.name)}">Reset PIN</button>
+            ${m.is_admin ? '' : `<button class="danger" data-act="remove" data-id="${esc(m.id)}" data-name="${esc(m.name)}">Remove</button>`}
+          </div></details>
+      </li>`).join('')}
+    </ul>
+    ${waiting.length ? `<p class="muted" style="margin-top:12px">${waiting.length === 1 ? 'Someone joined' : 'Some people joined'} after the draw. “Add to draw” slots them in and changes just one other person's assignment.</p>` : ''}
+  </div>
+  </div><div class="col">
+
+  <details class="card help" style="font-size:inherit;color:inherit">
+    <summary style="font-size:17px">Exchange details</summary>
+    <form data-form="details">
+      <label class="field">Exchange name<input name="gname" required maxlength="80" value="${esc(d.name)}"></label>
+      <label class="field">Exchange date<input name="date" type="date" value="${esc(d.exchange_date || '')}"></label>
+      <label class="field">Spending limit<input name="budget" maxlength="40" value="${esc(d.budget || '')}" placeholder="$50"></label>
+      <label class="field">Join by<input name="joinby" type="date" value="${esc(d.join_by || '')}"></label>
+      <button class="btn secondary">Save details</button>
+    </form>
+  </details>
+
+  <div class="card">
+    <h2>Don't pair</h2>
+    <p class="muted">People who shouldn't draw each other, like spouses. Works both ways.</p>
+    <form data-form="conflict" class="pair-form">
+      <label class="field">Person<select name="a" required><option value="">Choose</option>${opts}</select></label>
+      <span class="amp">&amp;</span>
+      <label class="field">Person<select name="b" required><option value="">Choose</option>${opts}</select></label>
+      <button class="btn secondary" style="grid-column:1/-1;margin-top:10px">Add rule</button>
+    </form>
+    ${ov.conflicts.length ? `<ul class="pairs">${ov.conflicts.map(c => `
+      <li><span>${esc(c.a_name)} <span class="muted">&amp;</span> ${esc(c.b_name)}</span>
+        <button class="x" data-act="rm-conflict" data-a="${esc(c.a)}" data-b="${esc(c.b)}" aria-label="Remove rule">✕</button></li>`).join('')}</ul>`
+      : '<p class="muted" style="margin-top:12px">No rules yet.</p>'}
+  </div>
+
+  <div class="card">
+    <h2>The draw</h2>
+    ${drawn
+      ? `<p class="muted">Names are drawn. Nobody, including you, can see anyone else's match.</p>
+         <button class="btn secondary" data-act="redraw">Redraw names</button>
+         <h3 style="margin-top:22px">Reveal the gift chain</h3>
+         ${ov.chain_revealed
+           ? `<p class="muted">Everyone can see the full chain on their home screen.</p>
+              <button class="btn secondary" data-act="chain-hide">Hide the chain again</button>`
+           : `<p class="muted">Save this for the party. Everyone will see who had whom, all the way around the loop.</p>
+              <button class="btn" data-act="chain-show">Reveal to everyone</button>`}`
+      : `<p class="muted">Everyone gets one person to buy for, in one big loop. Nobody, including you, can see anyone else's match.</p>
+         ${ov.warnings.length ? `<ul class="warnings">${ov.warnings.map(w => `<li>${esc(w)}</li>`).join('')}</ul>` : ''}
+         <button class="btn berry" data-act="draw" ${ov.warnings.length ? 'disabled' : ''}>Draw names</button>`}
+  </div>
+  </div></div>
+
+  <button class="linkbtn danger" data-act="delete-group">Delete this exchange</button>
+  <p class="fine">Use this after the holidays to erase everything.</p>`;
+}
+
+// ---------- render / data ----------
+function renderTabs() {
+  const isAdmin = S.state && S.state.member && S.state.member.is_admin;
+  $tabs.className = isAdmin ? 'show' : '';
+  $tabs.innerHTML = isAdmin ? `
+    <button class="${S.tab === 'home' ? 'on' : ''}" data-act="tab" data-tab="home">My gift</button>
+    <button class="${S.tab === 'admin' ? 'on' : ''}" data-act="tab" data-tab="admin">Organizer</button>` : '';
+}
+
+function render() {
+  const st = S.state;
+  if (st && st.member) {
+    $app.innerHTML = (S.tab === 'admin' && S.admin) ? viewAdmin(S.admin, st) : viewHome(st);
+  } else {
+    const html = S.view === 'create' ? viewCreate()
+      : (S.view === 'reclaim' && S.preview) ? viewReclaim(S.preview)
+      : S.preview ? viewJoin(S.preview)
+      : viewLanding(S.landingMsg);
+    $app.innerHTML = `<div class="narrow">${html}</div>`;
+  }
+  renderTabs();
+}
+
+async function refresh() {
+  S.state = await api('my_state');
+  const st = S.state;
+  if (st.member) {
+    if (new URLSearchParams(location.search).get('g') !== st.group.invite_code) setCodeInUrl(st.group.invite_code);
+    S.reveal = (st.in_draw && st.viewed) ? await api('reveal') : null;
+    if (!st.member.is_admin) S.tab = 'home';
+    S.admin = (st.member.is_admin && S.tab === 'admin') ? await api('admin_overview') : null;
+  } else {
+    S.reveal = null; S.admin = null;
+    const code = getCode();
+    S.preview = code ? await api('group_preview', { p_code: code }) : null;
+    if (code && !S.preview) { S.landingMsg = "That invite link wasn't recognized. Check it and try again."; setCodeInUrl(null); }
+  }
+  render();
+}
+
+async function shareText(text, title) {
+  try {
+    if (navigator.share) { await navigator.share(title ? { title, text } : { text }); return; }
+    await navigator.clipboard.writeText(text); toast('Copied. Paste it into your group text.');
+  } catch (err) {
+    if (err && err.name === 'AbortError') return;
+    try { await navigator.clipboard.writeText(text); toast('Copied. Paste it into your group text.'); }
+    catch { toast('Copy the text above', true); }
+  }
+}
+
+// ---------- events ----------
+document.addEventListener('submit', async e => {
+  const form = e.target.closest('form[data-form]');
+  if (!form) return;
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(form));
+  const btn = form.querySelector('button:not([type=button])');
+  const kind = form.dataset.form;
+  await busy(btn, async () => {
+    if (kind === 'code') {
+      const code = codeFromText(f.code);
+      if (!code) throw new Error('Paste the invite link or code');
+      setCodeInUrl(code); S.landingMsg = null; S.view = null;
+      await refresh();
+    } else if (kind === 'create') {
+      const r = await api('create_group', {
+        p_group_name: f.gname, p_exchange_date: f.date || null, p_budget: f.budget || null,
+        p_display_name: composeName(f.first, f.last), p_pin: f.pin,
+        p_amazon_url: f.amazon || null, p_wish_list: f.wishlist || null, p_join_by: f.joinby || null });
+      setCodeInUrl(r.invite_code); S.view = null; S.tab = 'admin';
+      await refresh(); toast('Your exchange is ready. Share the invite link!');
+    } else if (kind === 'join') {
+      await api('join_group', { p_code: getCode(), p_display_name: composeName(f.first, f.last), p_pin: f.pin,
+                                p_amazon_url: f.amazon || null, p_wish_list: f.wishlist || null });
+      if (S.pendingPhoto) { try { await api('set_photo', { p_photo: S.pendingPhoto }); } catch {} S.pendingPhoto = null; }
+      await refresh(); toast("You're in!");
+    } else if (kind === 'reclaim') {
+      const r = await api('reclaim', { p_code: getCode(), p_member_id: f.member, p_pin: f.pin });
+      if (!r.ok) throw new Error(r.error);
+      S.view = null; await refresh(); toast('Welcome back!');
+    } else if (kind === 'me') {
+      await api('update_me', { p_display_name: f.name, p_amazon_url: f.amazon || null,
+                               p_wish_list: f.wishlist || null, p_ship_to: f.ship || null });
+      await refresh(); toast('Saved');
+    } else if (kind === 'details') {
+      await api('update_group', { p_name: f.gname, p_exchange_date: f.date || null, p_budget: f.budget || null, p_join_by: f.joinby || null });
+      await refresh(); toast('Details saved');
+    } else if (kind === 'ask') {
+      await api('ask_question', { p_question: f.q });
+      await refresh(); toast('Sent. They won’t know it was you.');
+    } else if (kind === 'answer') {
+      await api('answer_question', { p_id: form.dataset.id, p_answer: f.a });
+      await refresh(); toast('Answer sent');
+    } else if (kind === 'conflict') {
+      if (!f.a || !f.b || f.a === f.b) throw new Error('Pick two different people');
+      await api('add_conflict', { p_a: f.a, p_b: f.b });
+      await refresh(); toast('Rule added');
+    }
+  });
+});
+
+document.addEventListener('change', async e => {
+  const el = e.target, act = el.dataset.act;
+  if (act === 'purchased') {
+    try {
+      await api('set_purchased', { p_done: el.checked });
+      if (el.checked) confetti();
+      await refresh();
+    } catch (err) { el.checked = !el.checked; toast(niceError(err), true); }
+  } else if (act === 'photo' || act === 'photo-pending') {
+    const file = el.files && el.files[0];
+    if (!file) return;
+    try {
+      const data = await shrinkPhoto(file);
+      if (act === 'photo-pending') {
+        S.pendingPhoto = data;
+        const pv = document.querySelector('[data-photo-preview]');
+        if (pv) pv.innerHTML = avatar('?', data, 'md');
+      } else {
+        await api('set_photo', { p_photo: data });
+        await refresh(); toast('Photo saved');
+      }
+    } catch (err) { toast(niceError(err), true); }
+    finally { el.value = ''; }
+  }
+});
+
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.tagName === 'INPUT') return;
+  const act = el.dataset.act, id = el.dataset.id, name = el.dataset.name;
+  const menu = el.closest('details.menu'); if (menu) menu.open = false;
+
+  if (act === 'go-create') { S.view = 'create'; render(); scrollTo(0, 0); return; }
+  if (act === 'go-landing') { S.view = null; render(); return; }
+  if (act === 'go-reclaim') { S.view = 'reclaim'; render(); scrollTo(0, 0); return; }
+  if (act === 'go-join') { S.view = null; render(); return; }
+  if (act === 'tab') { S.tab = el.dataset.tab; scrollTo(0, 0); await busy(null, refresh); return; }
+  if (act === 'dismiss-pin') { store('pinNoticeSeen', el.dataset.at); render(); return; }
+  if (act === 'photo-remove') {
+    if (!confirm('Remove your photo?')) return;
+    await busy(null, async () => { await api('set_photo', { p_photo: null }); await refresh(); });
+    return;
+  }
+
+  if (act === 'reveal') {
+    await busy(null, async () => {
+      const r = await api('reveal');
+      S.reveal = r; S.state.viewed = true;
+      const flip = document.getElementById('flip');
+      flip.querySelector('.flip-back').innerHTML = revealedCard(r, S.state.purchased, S.state.my_questions);
+      requestAnimationFrame(() => flip.classList.add('flipped'));
+      setTimeout(confetti, 350);
+    });
+    return;
+  }
+  if (act === 'share') {
+    const link = inviteLink(S.state.group.invite_code);
+    try {
+      if (navigator.share) await navigator.share({ title: S.state.group.name, text: `Join our gift exchange: ${S.state.group.name}`, url: link });
+      else { await navigator.clipboard.writeText(link); toast('Link copied'); }
+    } catch (err) { if (err && err.name !== 'AbortError') { try { await navigator.clipboard.writeText(link); toast('Link copied'); } catch { toast('Copy the link above', true); } } }
+    return;
+  }
+  if (act === 'reminder') { await shareText(reminderText(S.admin, S.state)); return; }
+  if (act === 'chain-show') {
+    const d = S.state.group.exchange_date;
+    const early = d && new Date(d + 'T00:00:00') > new Date();
+    if (!confirm(early ? 'It isn’t exchange day yet. Reveal who had whom to everyone anyway?' : 'Show everyone who had whom?')) return;
+    await busy(el, async () => { await api('set_chain_revealed', { p_show: true }); await refresh(); toast('The chain is revealed!'); confetti(); });
+    return;
+  }
+  if (act === 'chain-hide') { await busy(el, async () => { await api('set_chain_revealed', { p_show: false }); await refresh(); toast('Chain hidden'); }); return; }
+  if (act === 'draw') {
+    if (!confirm('Draw names now? Everyone will be able to see who they’re buying for.')) return;
+    await busy(el, async () => { await api('run_draw', { p_confirm: null }); await refresh(); toast('Names drawn! Let everyone know.'); confetti(); });
+    return;
+  }
+  if (act === 'redraw') {
+    let word = null;
+    if (S.admin.any_viewed) {
+      word = prompt('Someone has already seen who they got. Redrawing changes everyone’s person. Type REDRAW to continue.');
+      if (!word) return;
+    } else if (!confirm('Draw names again? Nobody has looked yet, so no one will notice.')) return;
+    await busy(el, async () => { await api('run_draw', { p_confirm: word }); await refresh(); toast('Names redrawn. Let everyone know to check again.'); });
+    return;
+  }
+  if (act === 'add-to-draw') { await busy(el, async () => { await api('add_to_draw', { p_member_id: id }); await refresh(); toast('Added to the draw'); }); return; }
+  if (act === 'rm-conflict') { await busy(el, async () => { await api('remove_conflict', { p_a: el.dataset.a, p_b: el.dataset.b }); await refresh(); }); return; }
+  if (act === 'reset-pin') {
+    const pin = prompt(`New 4-digit PIN for ${name}. They'll see a note on their screen that it was reset.`);
+    if (!pin) return;
+    await busy(null, async () => { await api('reset_pin', { p_member_id: id, p_new_pin: pin.trim() }); await refresh(); toast(`PIN reset. Let ${name} know.`); });
+    return;
+  }
+  if (act === 'remove') {
+    if (!confirm(`Remove ${name} from the exchange?`)) return;
+    await busy(null, async () => {
+      const r = await api('remove_member', { p_member_id: id }); await refresh();
+      toast(r.redraw_needed ? `${name} removed. Their spot couldn’t be refilled without breaking a rule, so draw names again.` : `${name} removed`);
+    });
+    return;
+  }
+  if (act === 'delete-group') {
+    const w = prompt('This erases the exchange for everyone. Type DELETE to confirm.');
+    if (!w) return;
+    await busy(null, async () => { await api('delete_group', { p_confirm: w }); setCodeInUrl(null); S.tab = 'home'; await refresh(); toast('Exchange deleted'); });
+  }
+});
+
+// Keep progress fresh while the app is open (skips while someone is typing).
+function quietRefresh() {
+  const typing = document.activeElement && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName);
+  const menuOpen = document.querySelector('details.menu[open]');
+  if (document.visibilityState === 'visible' && !typing && !menuOpen && S.state && S.state.member) refresh().catch(() => {});
+}
+document.addEventListener('visibilitychange', quietRefresh);
+setInterval(quietRefresh, 60000);
+
+// ---------- start ----------
+async function start() {
+  if (!window.GIFT_MOCK) {
+    if (!CFG.SUPABASE_URL || /YOUR-PROJECT/.test(CFG.SUPABASE_URL)) { $app.innerHTML = viewSetup(); return; }
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    sb = createClient(CFG.SUPABASE_URL, CFG.SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      const { error } = await sb.auth.signInAnonymously();
+      if (error) throw error;
+    }
+  }
+  await refresh();
+}
+start().catch(e => {
+  $app.innerHTML = `<section class="hero">${giftSvg(64, 'var(--berry)')}<h1>Something went wrong</h1>
+    <p class="muted">${esc(niceError(e))}</p><button class="btn" onclick="location.reload()">Try again</button></section>`;
+});
+</script>
+</body>
+</html>
