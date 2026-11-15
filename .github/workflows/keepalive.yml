@@ -1,6 +1,8 @@
 # Keeps the free Supabase database from pausing (it pauses after 7 days
 # with no activity). Runs every 2 days through the holidays, then stops
 # on its own. If a check ever fails, GitHub emails you automatically.
+# It reads the database address and public key from config.js, so there
+# is nothing else to set up.
 name: Keep gift exchange awake
 
 on:
@@ -24,24 +26,27 @@ jobs:
             echo "skip=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - uses: actions/checkout@v4
+        if: steps.when.outputs.skip != 'true'
+
       - name: Ping the database
         if: steps.when.outputs.skip != 'true'
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
-            echo "::error::Add SUPABASE_URL and SUPABASE_KEY under Settings > Secrets and variables > Actions"
-            exit 1
+          URL=$(grep -oE "https://[a-z0-9]+\.supabase\.co" config.js | head -1)
+          KEY=$(grep -oE "sb_publishable_[A-Za-z0-9_-]+|eyJ[A-Za-z0-9._-]+" config.js | head -1)
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "::error::Couldn't find the Supabase address and key in config.js"; exit 1
           fi
           body=$(curl -sS --fail-with-body --retry 4 --retry-delay 20 --retry-all-errors --max-time 30 \
-            -X POST "${SUPABASE_URL%/}/rest/v1/rpc/keepalive" \
-            -H "apikey: $SUPABASE_KEY" -H "Content-Type: application/json" -d '{}') || {
+            -X POST "$URL/rest/v1/rpc/keepalive" \
+            -H "apikey: $KEY" -H "Content-Type: application/json" -d '{}') || {
               echo "::error::Database didn't answer. If it says paused, open supabase.com and click Resume project."
               echo "$body"; exit 1; }
           echo "Database is awake: $body"
           echo "$body" | grep -q '"ok" *: *true'
 
       - name: Check the website loads
-        if: steps.when.outputs.skip != 'true' && vars.SITE_URL != ''
-        run: curl -sS --fail --retry 3 --retry-delay 15 --max-time 30 -o /dev/null "${{ vars.SITE_URL }}" && echo "Site is up"
+        if: steps.when.outputs.skip != 'true'
+        run: |
+          SITE="https://${GITHUB_REPOSITORY_OWNER,,}.github.io/${GITHUB_REPOSITORY#*/}/"
+          curl -sS --fail --retry 3 --retry-delay 15 --max-time 30 -o /dev/null "$SITE" && echo "Site is up: $SITE"
