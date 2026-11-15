@@ -643,10 +643,11 @@ function viewHome(st) {
   } else if (g.status === 'drawn') {
     main = `<div class="card"><h2>Hang tight</h2><p class="muted">Names were drawn before you joined. The organizer will add you, and your person will show up here.</p></div>`;
   } else {
-    main = `<div class="card" style="text-align:center">${giftSvg(56, 'var(--green)')}
+    main = `<div class="card" style="text-align:center"><span class="front-star" style="margin:0 0 6px">${starSvg(30)}</span>
       <h2>You're in!</h2><p class="muted">Names get drawn ${g.join_by ? `after ${fmtDate(g.join_by)}` : 'once everyone has joined'}. Come back then to see who you're buying for.</p></div>`;
   }
   return `
+  ${nativitySvg('sm')}
   <header class="top"><p class="eyebrow"><span class="star">✦</span>Merry Christmas, ${esc(me.name)}</p><h1>${esc(g.name)}</h1>
     ${metaLine(g) ? `<p class="meta">${metaLine(g)}</p>` : ''}</header>
   ${pinNotice ? `<div class="banner"><button class="x" data-act="dismiss-pin" data-at="${esc(me.pin_reset_at)}" aria-label="Dismiss">✕</button>
