@@ -1,6 +1,6 @@
 # Gift Exchange
 
-A small, ad-free Secret Santa web app for about 10 people. It works on iPhone (including the iPhone Duo, folded or open) and Android phones like the Galaxy S22+.
+A small, ad-free Christmas gift exchange web app for about 10 people. It works on iPhone (including the iPhone Duo, folded or open) and Android phones like the Galaxy S22+.
 
 - Everyone joins from one invite link you text them, with their first name, last initial and a 4-digit PIN. No email needed.
 - Optional profile photo; otherwise their initials show.
@@ -65,7 +65,7 @@ If a check ever fails, GitHub emails you. The usual fix is to open supabase.com 
 - **New phone or Home Screen app asks you to join again?** Tap **I already joined**, pick your name and enter your PIN. On iPhone, the Home Screen app keeps its own sign-in separate from Safari, so this is expected the first time.
 - **Forgot your PIN?** The organizer can reset it: Organizer tab → ··· next to the name → *Reset PIN*.
 - **Someone joins late?** The organizer taps **Add to draw**. That person slots into the loop, and only one other person's assignment changes.
-- **Written lists:** one idea per line. A line that's just a web link becomes tappable for your Santa.
+- **Written lists:** one idea per line. A line that's just a web link becomes tappable for whoever is buying for you.
 - **Questions:** buyers can ask their person anything from the reveal card. Answers show up for the buyer; the person never learns who asked.
 - **Already set up the database before?** Just run `supabase/schema.sql` again in the SQL Editor. It adds the new pieces and keeps your data.
 
